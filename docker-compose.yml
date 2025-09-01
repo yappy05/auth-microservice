@@ -1,0 +1,31 @@
+services:
+
+  auth-db:
+    image: postgres:latest
+    container_name: auth-postgres
+    ports:
+      - 5444:5432
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_URI: postgresql://postgres:admin@localhost:5444/auth-db
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+
+  rabbitmq:
+    container_name: rabbitmq-auth-microservice
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+
+volumes:
+  auth_data:
+networks:
+  app-network:
