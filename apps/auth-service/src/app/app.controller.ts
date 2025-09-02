@@ -1,8 +1,9 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { RegisterDto } from '@backend/shared-dto';
-
+import { LoginDto, RegisterDto, TokensResponse } from '@backend/shared-dto';
+import {Response} from 'express';
+import { AuthGuard } from '@nestjs/passport';
 
 
 @Controller()
@@ -13,8 +14,17 @@ export class AppController {
 
 
   @MessagePattern('register')
-  handleRegisterAuth(@Payload() dto: RegisterDto) {
-    console.log(dto)
-    return this.appService.register(dto)
+  async handleRegisterAuth(@Payload() dto: RegisterDto) {
+    return await this.appService.register(dto)
   }
+  @MessagePattern('login')
+  async handleLoginAuth(@Payload() dto: LoginDto): Promise<TokensResponse>{
+    console.log('start login')
+    return await this.appService.login(dto)
+  }
+  @MessagePattern('logout')
+  handleLogoutAuth(@Payload() userId: string) {
+    this.appService.logout(userId)
+  }
+
 }

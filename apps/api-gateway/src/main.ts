@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // app.useGlobalFilters(new RpcExceptionFilter())
   const config = app.get(ConfigService)
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);

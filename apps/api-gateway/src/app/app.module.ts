@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule } from '@nestjs/config';
+import { JwtCoreModule } from './jwt-core-module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ConfigModule } from '@nestjs/config';
         }
       },
     ]),
+    JwtCoreModule,
     ConfigModule.forRoot({
       isGlobal: true
     })
