@@ -1,11 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ConfigModule } from '@nestjs/config';
-import { JwtCoreModule } from './jwt-core-module';
 import { UserService } from './user.service';
-import { UserModule } from './user.module';
 
 @Module({
   imports: [
@@ -20,16 +15,10 @@ import { UserModule } from './user.module';
             durable: true
           }
         }
-      },
-    ]),
-    JwtCoreModule,
-    UserModule,
-    ConfigModule.forRoot({
-      isGlobal: true
-    })
+      }
+    ])
   ],
-  controllers: [AppController],
-  providers: [AppService, UserService],
-  exports: [AppService]
+  providers: [UserService],
+  exports: [UserService]
 })
-export class AppModule {}
+export class UserModule {}

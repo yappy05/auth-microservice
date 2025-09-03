@@ -7,6 +7,10 @@ import { ConfigModule } from '@nestjs/config';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { JwtCoreModule } from '../../../api-gateway/src/app/jwt-core-module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import Redis from 'ioredis';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
+
 
 @Module({
   imports: [
@@ -24,14 +28,28 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           queue: 'email_service',
           prefetchCount: 1,
           queueOptions: {
-            durable: true
+            durable: true,
           },
-        }
+        },
       },
     ]),
+    PrismaModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
-  exports: [],
+  providers: [
+    AppService,
+    {
+      provide: 'REDIS_CLIENT',
+      useFactory: () =>
+        new Redis({
+          host: 'localhost',
+          port: 6381,
+        }),
+    },
+  ],
+  exports: [AppService],
 })
 export class AppModule {}

@@ -1,7 +1,7 @@
 import { Body, ConflictException, Controller, Get, Inject, Post, Res, UseFilters, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ClientProxy } from '@nestjs/microservices';
-import { LoginDto, RegisterDto, TokensResponse } from '@backend/shared-dto';
+import { ConfirmVerification, LoginDto, RegisterDto, TokensResponse } from '@backend/shared-dto';
 import { firstValueFrom } from 'rxjs';
 import { AllExceptionsFilter } from './rpc-exception.filter';
 import {Response} from 'express';
@@ -22,8 +22,14 @@ export class AppController {
     return this.appService.getData();
   }
 
+  // @Post('auth/find-by-id')
+  // async findUserById (@Body('userId') userId: string) {
+  //   return await this.appService.findUser(userId)
+  // }
+
   @Post('auth/register')
   async register(@Res({passthrough: true}) res: Response, @Body() dto: RegisterDto) {
+    console.log('gtaway-service')
     const response: TokensResponse = await firstValueFrom(this.authClient.send('register', dto));
     // return response
     const {refreshToken} = response;
@@ -44,6 +50,7 @@ export class AppController {
       httpOnly: false,
       sameSite: 'lax'
     })
+    console.log(response)
     return response
   }
 
@@ -51,5 +58,15 @@ export class AppController {
   logout (@Res({passthrough: true}) res: Response, @Body('userId') userId: string) {
     this.authClient.emit('logout', userId)
     res.clearCookie('refreshToken')
+  }
+
+  @Post('auth/send-verify')
+  async sendVerifyCode(@Body('userId') userId: string){
+    await firstValueFrom(this.authClient.send('send-verify', userId))
+  }
+
+  @Post('auth/confirm-verification')
+  async verify(@Body() payload: ConfirmVerification) {
+    await firstValueFrom(this.authClient.send('confirm-verification', payload))
   }
 }
